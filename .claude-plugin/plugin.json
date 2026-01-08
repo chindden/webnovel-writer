@@ -1,0 +1,13 @@
+{
+  "name": "webnovel-writer",
+  "version": "1.0.0",
+  "description": "Chinese webnovel writing assistant with anti-hallucination protocols (三大定律), cool-points strategy (爽点系统), and Strand Weave pacing control.",
+  "license": "GPL-3.0",
+  "author": {
+    "name": "lcy"
+  },
+  "keywords": ["webnovel", "chinese", "writing", "网文", "小说", "workflow", "state", "git"],
+  "commands": "./commands/",
+  "skills": "./skills/",
+  "agents": "./agents/"
+}
