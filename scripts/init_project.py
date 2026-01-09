@@ -49,11 +49,14 @@ def _write_text_if_missing(path: Path, content: str) -> None:
 
 
 def _ensure_state_schema(state: Dict[str, Any]) -> Dict[str, Any]:
-    """确保 state.json 具备脚本族所需的最低字段集合（兼容旧版本）。"""
+    """确保 state.json 具备 v5.0 架构所需的字段集合。"""
     state.setdefault("project_info", {})
     state.setdefault("progress", {})
     state.setdefault("protagonist_state", {})
     state.setdefault("relationships", {})
+    state.setdefault("structured_relationships", [])
+    state.setdefault("disambiguation_warnings", [])
+    state.setdefault("disambiguation_pending", [])
     state.setdefault("world_settings", {"power_system": [], "factions": [], "locations": []})
     state.setdefault("plot_threads", {"active_threads": [], "foreshadowing": []})
     state.setdefault("review_checkpoints", [])
@@ -68,10 +71,13 @@ def _ensure_state_schema(state: Dict[str, Any]) -> Dict[str, Any]:
             "history": [],
         },
     )
+    # v5.0: entities_v3 分组格式（按类型）
     state.setdefault(
-        "entities",
-        {"characters": [], "locations": [], "items": [], "factions": [], "techniques": []},
+        "entities_v3",
+        {"角色": {}, "地点": {}, "物品": {}, "势力": {}, "招式": {}},
     )
+    # v5.0: alias_index 一对多映射
+    state.setdefault("alias_index", {})
 
     # progress schema evolution
     state["progress"].setdefault("current_chapter", 0)
