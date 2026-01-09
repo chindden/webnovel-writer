@@ -191,18 +191,26 @@ class RAGAdapter:
         # 提取内容用于嵌入
         contents = [c["content"] for c in chunks]
 
-        # 调用 API 获取嵌入向量
+        # 调用 API 获取嵌入向量（可能包含 None 表示失败）
         embeddings = await self.api_client.embed_batch(contents)
 
         if not embeddings:
             return 0
 
-        # 存储到数据库
+        # 存储到数据库（跳过嵌入失败的 chunk）
         stored = 0
+        skipped = 0
         with self._get_conn() as conn:
             cursor = conn.cursor()
 
             for chunk, embedding in zip(chunks, embeddings):
+                if embedding is None:
+                    # 嵌入失败，跳过该 chunk（仅存储 BM25 索引供关键词检索）
+                    skipped += 1
+                    chunk_id = f"ch{chunk['chapter']}_s{chunk['scene_index']}"
+                    self._update_bm25_index(cursor, chunk_id, chunk["content"])
+                    continue
+
                 chunk_id = f"ch{chunk['chapter']}_s{chunk['scene_index']}"
 
                 # 将向量序列化为 bytes
@@ -226,6 +234,9 @@ class RAGAdapter:
                 stored += 1
 
             conn.commit()
+
+        if skipped > 0:
+            print(f"[WARN] store_chunks: {skipped} chunks skipped due to embedding failure (BM25 only)")
 
         return stored
 

@@ -151,6 +151,9 @@ python -m data_modules.state_manager process-chapter --chapter 100 --data '{...}
 - 新关系添加到 `relationships`
 - 新别名注册到 `alias_index`（一对多格式）
 - 更新 `progress.current_chapter`
+- **自动同步主角状态**：`entities_v3.角色.{主角ID}.current` → `protagonist_state`
+
+> **主角同步说明**：为避免双源不一致，`process_chapter_result()` 会自动调用 `sync_protagonist_from_entity()`，将主角实体的 realm/location 同步到 `protagonist_state`，确保 consistency-checker 等依赖 `protagonist_state` 的组件获取最新数据。
 
 **更新 index.db**:
 ```bash

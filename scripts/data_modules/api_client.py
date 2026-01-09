@@ -113,21 +113,41 @@ class ModalAPIClient:
                 print(f"[ERR] Embed: {e}")
                 return None
 
-    async def embed_batch(self, texts: List[str]) -> List[List[float]]:
-        """分批 Embedding"""
-        all_embeddings = []
+    async def embed_batch(
+        self, texts: List[str], *, skip_failures: bool = True
+    ) -> List[Optional[List[float]]]:
+        """
+        分批 Embedding
+
+        Args:
+            texts: 要嵌入的文本列表
+            skip_failures: True 时失败的文本返回 None；False 时任一失败则整体返回空列表
+
+        Returns:
+            与 texts 等长的列表，成功的位置是向量，失败的位置是 None
+        """
+        if not texts:
+            return []
+
+        all_embeddings: List[Optional[List[float]]] = []
         batch_size = self.config.embed_batch_size
 
         batches = [texts[i:i + batch_size] for i in range(0, len(texts), batch_size)]
         tasks = [self.embed(batch) for batch in batches]
         results = await asyncio.gather(*tasks)
 
-        for result in results:
-            if result:
+        for batch_idx, result in enumerate(results):
+            actual_batch_size = len(batches[batch_idx])
+            if result and len(result) == actual_batch_size:
                 all_embeddings.extend(result)
             else:
-                # 失败时填充零向量
-                all_embeddings.extend([[0.0] * 4096] * batch_size)
+                if not skip_failures:
+                    # 严格模式：任一批次失败则整体失败
+                    print(f"[WARN] Embed batch {batch_idx} failed, aborting all")
+                    return []
+                # 宽松模式：失败的位置填充 None（调用方需检查）
+                print(f"[WARN] Embed batch {batch_idx} failed, marking {actual_batch_size} items as None")
+                all_embeddings.extend([None] * actual_batch_size)
 
         return all_embeddings[:len(texts)]
 

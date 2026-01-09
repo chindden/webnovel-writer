@@ -75,15 +75,18 @@ class ContextPackBuilder:
 
     def build(self, chapter_num: int) -> Dict[str, Any]:
         """构建完整上下文包"""
+        state = self._load_state()
+
         return {
             "meta": {
                 "chapter": chapter_num,
                 "project_root": str(self.project_root),
-                "version": "4.0"
+                "version": "5.0"
             },
             "core": self._build_core(chapter_num),
             "scene": self._build_scene(chapter_num),
-            "global": self._build_global()
+            "global": self._build_global(),
+            "alerts": self._build_alerts(state)
         }
 
     def _build_core(self, chapter_num: int) -> Dict[str, Any]:
@@ -117,6 +120,13 @@ class ContextPackBuilder:
             "worldview_skeleton": self._load_skeleton("世界观"),
             "power_system_skeleton": self._load_skeleton("力量体系"),
             "style_contract_ref": self._get_style_contract_ref()
+        }
+
+    def _build_alerts(self, state: Dict) -> Dict[str, Any]:
+        """风险提示：消歧警告、待确认项（v5.0）"""
+        return {
+            "disambiguation_warnings": state.get("disambiguation_warnings", [])[-10:],
+            "disambiguation_pending": state.get("disambiguation_pending", [])[-10:]
         }
 
     # ================== 辅助方法 ==================

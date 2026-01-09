@@ -856,6 +856,9 @@ class StateManager:
         # 更新进度
         self.update_progress(chapter)
 
+        # 同步主角状态（entities_v3 → protagonist_state）
+        self.sync_protagonist_from_entity()
+
         return warnings
 
     # ==================== 导出 ====================
@@ -883,6 +886,89 @@ class StateManager:
                 "pending": self._state.get("disambiguation_pending", [])[-20:],
             },
         }
+
+    # ==================== 主角同步 ====================
+
+    def get_protagonist_entity_id(self) -> Optional[str]:
+        """获取主角实体 ID（通过 is_protagonist 标记或 protagonist_state.name 查找）"""
+        # 方式1: 查找 is_protagonist 标记
+        for eid, e in self._state.get("entities_v3", {}).get("角色", {}).items():
+            if e.get("is_protagonist"):
+                return eid
+
+        # 方式2: 通过 protagonist_state.name 查找
+        protag_name = self._state.get("protagonist_state", {}).get("name")
+        if protag_name:
+            alias_entries = self._state.get("alias_index", {}).get(protag_name, [])
+            for entry in alias_entries:
+                if entry.get("type") == "角色":
+                    return entry.get("id")
+
+        return None
+
+    def sync_protagonist_from_entity(self, entity_id: str = None):
+        """
+        将 entities_v3 中主角实体的状态同步到 protagonist_state
+
+        用于确保 consistency-checker 等依赖 protagonist_state 的组件获取最新数据
+        """
+        if entity_id is None:
+            entity_id = self.get_protagonist_entity_id()
+        if entity_id is None:
+            return
+
+        entity = self.get_entity(entity_id, "角色")
+        if not entity:
+            return
+
+        current = entity.get("current", {})
+        protag = self._state.setdefault("protagonist_state", {})
+
+        # 同步境界
+        if "realm" in current:
+            power = protag.setdefault("power", {})
+            power["realm"] = current["realm"]
+            if "layer" in current:
+                power["layer"] = current["layer"]
+
+        # 同步位置
+        if "location" in current:
+            loc = protag.setdefault("location", {})
+            loc["current"] = current["location"]
+            if "last_chapter" in current:
+                loc["last_chapter"] = current["last_chapter"]
+
+    def sync_protagonist_to_entity(self, entity_id: str = None):
+        """
+        将 protagonist_state 同步到 entities_v3 中的主角实体
+
+        用于初始化或手动编辑 protagonist_state 后保持一致性
+        """
+        if entity_id is None:
+            entity_id = self.get_protagonist_entity_id()
+        if entity_id is None:
+            return
+
+        protag = self._state.get("protagonist_state", {})
+        if not protag:
+            return
+
+        updates = {}
+
+        # 同步境界
+        power = protag.get("power", {})
+        if power.get("realm"):
+            updates["realm"] = power["realm"]
+        if power.get("layer"):
+            updates["layer"] = power["layer"]
+
+        # 同步位置
+        loc = protag.get("location", {})
+        if loc.get("current"):
+            updates["location"] = loc["current"]
+
+        if updates:
+            self.update_entity(entity_id, updates, "角色")
 
 
 # ==================== CLI 接口 ====================
