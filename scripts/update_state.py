@@ -74,7 +74,7 @@ class StateUpdater:
         self.state = None
 
     def _validate_schema(self, state: Dict) -> bool:
-        """验证 state.json 的基本结构"""
+        """验证 state.json 的基本结构 (v5.0)"""
         required_keys = [
             "project_info",
             "progress",
@@ -105,6 +105,29 @@ class StateUpdater:
         if not (has_nested_location or has_flat_location):
             print(f"❌ 缺少 protagonist_state.location 字段")
             return False
+
+        # 验证并补全 strand_tracker 结构（兼容旧 state.json）
+        tracker = state.get("strand_tracker")
+        if tracker is None or not isinstance(tracker, dict):
+            if tracker is None:
+                print("⚠️ strand_tracker 缺失，已自动补全默认结构")
+            else:
+                print("⚠️ strand_tracker 类型异常，已重置默认结构")
+            state["strand_tracker"] = {
+                "last_quest_chapter": 0,
+                "last_fire_chapter": 0,
+                "last_constellation_chapter": 0,
+                "current_dominant": "quest",
+                "chapters_since_switch": 0,
+                "history": [],
+            }
+        else:
+            tracker.setdefault("last_quest_chapter", 0)
+            tracker.setdefault("last_fire_chapter", 0)
+            tracker.setdefault("last_constellation_chapter", 0)
+            tracker.setdefault("current_dominant", "quest")
+            tracker.setdefault("chapters_since_switch", 0)
+            tracker.setdefault("history", [])
 
         return True
 

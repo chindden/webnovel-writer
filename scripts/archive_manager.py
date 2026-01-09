@@ -134,23 +134,22 @@ class ArchiveManager:
         }
 
     def identify_inactive_characters(self, state):
-        """识别不活跃的次要角色"""
+        """识别不活跃的次要角色 (v5.0 entities_v3 格式)"""
         current_chapter = state.get("progress", {}).get("current_chapter", 0)
-        characters = state.get("entities", {}).get("characters", [])
+        # v5.0: 从 entities_v3.角色 获取角色列表
+        entities_v3 = state.get("entities_v3", {})
+        characters_dict = entities_v3.get("角色", {})
         threshold = self.config["character_inactive_threshold"]
 
         inactive = []
-        for char in characters:
-            # 只归档次要角色（importance="minor"）
-            importance = char.get("importance")
-            if not importance:
-                tier = str(char.get("tier", "")).strip()
-                importance = "major" if tier == "核心" else "minor"
-            if importance != "minor":
+        for char_id, char in characters_dict.items():
+            # 只归档次要角色（tier="装饰" 或 tier="支线"）
+            tier = str(char.get("tier", "")).strip()
+            if tier == "核心":
                 continue
 
             # 检查最后出场章节
-            last_appearance = char.get("last_appearance_chapter", 0)
+            last_appearance = char.get("last_appearance", 0)
             try:
                 last_appearance = int(last_appearance)
             except (TypeError, ValueError):
@@ -161,8 +160,16 @@ class ArchiveManager:
             inactive_chapters = current_chapter - last_appearance
 
             if inactive_chapters >= threshold:
+                # 构造兼容结构
+                char_data = {
+                    "id": char_id,
+                    "name": char.get("canonical_name", char_id),
+                    "tier": tier,
+                    "last_appearance_chapter": last_appearance
+                }
+                char_data.update(char)
                 inactive.append({
-                    "character": char,
+                    "character": char_data,
                     "inactive_chapters": inactive_chapters,
                     "last_appearance": last_appearance
                 })
@@ -351,14 +358,15 @@ class ArchiveManager:
         return len(old_reviews_list)
 
     def remove_from_state(self, state, inactive_chars, resolved_threads, old_reviews):
-        """从 state.json 中移除已归档的数据"""
-        # 移除不活跃角色
+        """从 state.json 中移除已归档的数据 (v5.0 entities_v3 格式)"""
+        # 移除不活跃角色 (v5.0: 从 entities_v3.角色 中移除)
         if inactive_chars:
-            char_names = {item["character"]["name"] for item in inactive_chars}
-            state["entities"]["characters"] = [
-                char for char in state["entities"]["characters"]
-                if char["name"] not in char_names
-            ]
+            char_ids = {item["character"].get("id") for item in inactive_chars}
+            entities_v3 = state.get("entities_v3", {})
+            characters_dict = entities_v3.get("角色", {})
+            for char_id in char_ids:
+                if char_id in characters_dict:
+                    del characters_dict[char_id]
 
         # 移除已归档的伏笔
         if resolved_threads:
@@ -491,8 +499,22 @@ class ArchiveManager:
         archived = [char for char in archived if char["name"] != name]
         self.save_archive(self.characters_archive, archived)
 
-        # 恢复到 state.json
-        state["entities"]["characters"].append(char_to_restore)
+        # 恢复到 state.json (v5.0: 添加到 entities_v3.角色)
+        if "entities_v3" not in state:
+            state["entities_v3"] = {"角色": {}, "地点": {}, "物品": {}, "势力": {}, "招式": {}}
+        if "角色" not in state["entities_v3"]:
+            state["entities_v3"]["角色"] = {}
+
+        char_id = char_to_restore.get("id", char_to_restore.get("name", "unknown"))
+        state["entities_v3"]["角色"][char_id] = {
+            "canonical_name": char_to_restore.get("name", char_id),
+            "tier": char_to_restore.get("tier", "装饰"),
+            "desc": char_to_restore.get("desc", ""),
+            "current": char_to_restore.get("current", {}),
+            "first_appearance": char_to_restore.get("first_appearance", 0),
+            "last_appearance": char_to_restore.get("last_appearance", 0),
+            "history": char_to_restore.get("history", [])
+        }
         self.save_state(state)
 
         # ✅ Priority 2 修复：同步恢复索引状态为 'active'

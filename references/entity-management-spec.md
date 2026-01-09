@@ -1,19 +1,21 @@
 # 实体管理规范 (Entity Management Specification)
 
-> **版本**: 4.0
+> **版本**: 5.0
 > **适用范围**: 所有实体类型（角色/地点/物品/势力/招式）
-> **核心目标**: 解决别名识别、创建/更新检测、版本追踪问题
+> **核心目标**: AI 驱动的实体提取、别名管理、版本追踪
 
 ---
 
-## v4.0 变更
+## v5.0 变更
 
-1. **alias_index 一对多**: 同一别名可映射到多个实体（如"天云宗"同时是地点和势力）
-2. **操作扩展**: 新增 `<unset>`/`<add>`/`<remove>`/`<inc>` 操作
-3. **顶层字段支持**: `tier`/`desc`/`canonical_name`/`status`/`parent` 可直接通过 `<entity-update>` 修改
-4. **删除旧格式兼容**: 不再支持 `[NEW_ENTITY]`/`[GOLDEN_FINGER_SKILL]` 等方括号格式
-5. **删除类型别名**: 不再支持 `功法→招式`、`人物→角色` 等别名转换
-6. **消除索引回路**: 索引层不再写回 state.json
+1. **AI 提取替代 XML 标签**: Data Agent 从纯正文语义提取实体，不再依赖 `extract_entities.py`
+2. **alias_index 一对多**: 同一别名可映射到多个实体，内嵌在 `state.json`
+3. **entities_v3 分组格式**: 按类型分组（角色/地点/物品/势力/招式）
+4. **置信度消歧**: >0.8 自动采用，0.5-0.8 警告，<0.5 人工确认
+5. **无向后兼容**: 不保留旧版 `entities` 列表格式
+6. **双 Agent 架构**: Context Agent (读) + Data Agent (写)
+
+> **注意**: XML 标签仍可用于手动标注场景，但 v5.0 主流程不再要求。
 
 ---
 
@@ -81,7 +83,7 @@
 
 ### 2.3 更新属性 (`<entity-update>`)
 
-属性发生重大变化时使用（v4.0 支持多种操作）：
+属性发生重大变化时使用（v5.0 支持多种操作）：
 
 ```xml
 <!-- 基础操作 -->
@@ -192,7 +194,7 @@
 }
 ```
 
-**注意**: v4.0 的 `alias_index` 值为数组（一对多），不再是单个对象。
+**注意**: v5.0 的 `alias_index` 值为数组（一对多），不再是单个对象。
 
 ### 3.2 ID 生成规则
 
@@ -236,7 +238,10 @@ def generate_entity_id(entity_type: str, name: str, existing_ids: set) -> str:
 
 ## 四、处理流程
 
-### 4.1 完整流程图
+> **v5.0 说明**: 以下流程描述的是 XML 标签解析流程，仅适用于**手动标注场景**。
+> v5.0 主流程使用 Data Agent 从纯正文 AI 提取实体，参见 `agents/data-agent.md`。
+
+### 4.1 完整流程图（手动标注场景）
 
 ```
 章节内容
@@ -369,12 +374,14 @@ def resolve_entity_by_alias(alias: str, entity_type: str, state: dict) -> tuple:
 
 ## 六、迁移策略（已移除）
 
-本插件不再提供旧格式迁移与向后兼容（无生产项目）。推荐做法：
+本插件不再提供旧格式迁移与向后兼容。v5.0 推荐做法：
 
 1. 删除 `.webnovel/index.db`（索引可重建）
-2. 保留章节文件不动（章节 + 章末 XML 标签是唯一真相）
-3. 按章节顺序重跑 `extract_entities.py`（重建 `state.json` 与设定集）
-4. 运行 `structured_index.py --rebuild-index` 重建索引库
+2. 保留章节文件不动（纯正文是唯一真相）
+3. 运行 `python -m data_modules.index_manager rebuild --project-root .` 重建索引
+4. Data Agent 会在后续章节中自动提取实体
+
+> **注意**: v5.0 不再依赖 `extract_entities.py`，实体提取由 Data Agent 自动完成。
 
 ---
 
@@ -432,7 +439,7 @@ def query_entity_at_chapter(entity_id: str, entity_type: str, chapter: int) -> d
 
 ### 8.1 别名冲突
 
-v4.0 允许 **alias_index 一对多**：同一别名可以指向多个实体（跨类型或同类型）。
+v5.0 允许 **alias_index 一对多**：同一别名可以指向多个实体（跨类型或同类型）。
 
 当你用 `ref="别名"` 进行引用，但命中多个实体且无法消歧时，脚本会直接报错：
 

@@ -1,10 +1,17 @@
 ---
 name: tag-specification
-purpose: 章节写作时加载，确保正确使用XML标签
+purpose: XML 标签格式参考（v5.0 可选使用）
+version: "5.0"
 ---
 
 <context>
-此文件用于XML标签格式参考。Claude 已知XML语法，这里只补充网文创作特定的标签类型和属性规范。
+此文件用于 XML 标签格式参考。
+
+**v5.0 重要变更**:
+- 章节写作时**不再要求**添加 XML 标签
+- Data Agent 会自动从纯正文中提取实体
+- 标签仅用于**手动标注**场景（如明确标记重要实体、补充提取遗漏）
+- 如果你选择使用标签，请遵循以下规范
 </context>
 
 <instructions>

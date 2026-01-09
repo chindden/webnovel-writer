@@ -311,7 +311,7 @@
 <entity type="未来事件" name="事件名称" desc="事件描述" tier="层级" time="发生时间" strategy="应对策略"/>
 ```
 
-这些标签将被 `extract_entities.py` 自动识别并提取。
+> **v5.0 注意**: 这些标签为**可选**。Data Agent 可从纯正文自动提取实体，标签仅用于手动标注场景。
 
 ---
 

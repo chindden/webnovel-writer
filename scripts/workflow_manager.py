@@ -51,7 +51,7 @@ def start_task(command, args):
             'chapter_file': {},
             'git_status': {},
             'state_json_modified': False,
-            'entities_extracted': False,
+            'entities_appeared': False,
             'review_completed': False
         }
     }
@@ -242,8 +242,34 @@ def analyze_recovery_options(interrupt_info):
 
         return options
 
-    elif step_id == 'Step 2.5':
-        # Step 2.5中断：润色中（正文已生成，可能部分改写）
+    elif step_id == 'Step 3':
+        # Step 3 中断：审查未完成
+        return [
+            {
+                'option': 'A',
+                'label': '重新执行审查',
+                'risk': 'medium',
+                'description': '重新调用5个审查员（并行）',
+                'actions': [
+                    "重新调用5个审查员（并行）",
+                    "生成审查报告",
+                    "继续 Step 4 润色"
+                ]
+            },
+            {
+                'option': 'B',
+                'label': '跳过审查，直接润色',
+                'risk': 'low',
+                'description': '不进行审查，可后续用 /webnovel-review 补审',
+                'actions': [
+                    "标记审查为已跳过",
+                    "继续 Step 4 润色"
+                ]
+            }
+        ]
+
+    elif step_id == 'Step 4':
+        # Step 4 中断：润色中
         project_root = find_project_root()
         existing_chapter = find_chapter_file(project_root, chapter_num)
         draft_path = None
@@ -253,23 +279,21 @@ def analyze_recovery_options(interrupt_info):
             draft_path = default_chapter_draft_path(project_root, chapter_num)
             chapter_path = str(draft_path.relative_to(project_root))
 
-        options = [{
-            'option': 'A',
-            'label': '基于现有文件继续润色',
-            'risk': 'low',
-            'description': f"继续润色 {chapter_path}，完成后进入Step 3",
-            'actions': [
-                f"打开并继续润色 {chapter_path}",
-                "保存文件",
-                "继续Step 3（Extract Entities）"
-            ]
-        }]
-
-        candidate = existing_chapter or draft_path
-        if candidate and candidate.exists():
-            options.append({
+        return [
+            {
+                'option': 'A',
+                'label': '继续润色',
+                'risk': 'low',
+                'description': f"继续润色 {chapter_path}，完成后进入 Step 5",
+                'actions': [
+                    f"打开并继续润色 {chapter_path}",
+                    "保存文件",
+                    "继续 Step 5（Data Agent）"
+                ]
+            },
+            {
                 'option': 'B',
-                'label': '删除润色稿，从Step 2重写',
+                'label': '删除润色稿，从 Step 2 重写',
                 'risk': 'medium',
                 'description': f"删除 {chapter_path}，重新生成章节内容",
                 'actions': [
@@ -278,60 +302,30 @@ def analyze_recovery_options(interrupt_info):
                     "清理中断状态",
                     f"执行 /{command} {chapter_num}"
                 ]
-            })
-
-        return options
-
-    elif step_id in ['Step 3', 'Step 5']:
-        # Step 3/5中断：脚本未执行完
-        return [{
-            'option': 'A',
-            'label': f'从{step_id}重新开始',
-            'risk': 'low',
-            'description': '重新运行脚本（幂等操作）',
-            'actions': [
-                f"重新执行脚本",
-                f"继续后续Step"
-            ]
-        }]
-
-    elif step_id == 'Step 4':
-        # Step 4中断：state.json可能部分更新
-        return [
-            {
-                'option': 'A',
-                'label': '检查并修复state.json',
-                'risk': 'medium',
-                'description': '验证state.json一致性，补全缺失字段',
-                'actions': [
-                    "读取 state.json",
-                    "检查必要字段（progress, protagonist_state等）",
-                    "如缺失则从前一章推断",
-                    "重新执行 update_state.py",
-                    "继续Step 5"
-                ]
-            },
-            {
-                'option': 'B',
-                'label': '回滚到上一章',
-                'risk': 'high',
-                'description': '恢复到上一章的state.json快照',
-                'actions': [
-                    f"git checkout ch{(chapter_num-1):04d} -- .webnovel/state.json",
-                    f"删除第{chapter_num}章文件",
-                    "清理中断状态"
-                ]
             }
         ]
 
-    elif step_id == 'Step 7':
-        # Step 7中断：Git未提交
+    elif step_id == 'Step 5':
+        # Step 5 中断：Data Agent 处理中
+        return [{
+            'option': 'A',
+            'label': '从 Step 5 重新开始',
+            'risk': 'low',
+            'description': '重新运行 Data Agent（幂等操作）',
+            'actions': [
+                "重新调用 Data Agent",
+                "继续 Step 6（Git 备份）"
+            ]
+        }]
+
+    elif step_id == 'Step 6':
+        # Step 6 中断：Git 未提交
         return [
             {
                 'option': 'A',
-                'label': '继续Git提交',
+                'label': '继续 Git 提交',
                 'risk': 'low',
-                'description': '完成未完成的Git commit + tag',
+                'description': '完成未完成的 Git commit + tag',
                 'actions': [
                     "检查 Git 暂存区",
                     "重新执行 backup_manager.py",
@@ -340,40 +334,13 @@ def analyze_recovery_options(interrupt_info):
             },
             {
                 'option': 'B',
-                'label': '回滚Git改动',
+                'label': '回滚 Git 改动',
                 'risk': 'medium',
                 'description': '丢弃暂存区所有改动',
                 'actions': [
                     "git reset HEAD .",
                     f"删除第{chapter_num}章文件",
                     "清理中断状态"
-                ]
-            }
-        ]
-
-    elif step_id == 'Step 6':
-        # Step 6中断：审查未完成
-        return [
-            {
-                'option': 'A',
-                'label': '重新执行双章审查',
-                'risk': 'high',
-                'description': '重新调用5个审查员（成本高，耗时长）',
-                'actions': [
-                    "重新调用5个审查员（并行）",
-                    "生成审查报告",
-                    "更新 state.json review_checkpoints"
-                ]
-            },
-            {
-                'option': 'B',
-                'label': '跳过审查，继续下一章',
-                'risk': 'medium',
-                'description': '不进行审查（可后续用 /webnovel-review 补审）',
-                'actions': [
-                    "标记审查为已跳过",
-                    "清理中断状态",
-                    "可继续创作下一章"
                 ]
             }
         ]
@@ -448,9 +415,16 @@ def save_state(state):
     atomic_write_json(state_file, state, use_lock=True, backup=False)
 
 def get_pending_steps(command):
-    """获取待执行步骤列表"""
+    """获取待执行步骤列表 (v5.0)"""
     if command == 'webnovel-write':
-        return ['Step 1', 'Step 2', 'Step 2.5', 'Step 3', 'Step 4', 'Step 5', 'Step 6', 'Step 7']
+        # v5.0 工作流：6 步
+        # Step 1: Context Agent 搜集上下文
+        # Step 2: 生成章节内容 (纯正文，3000-5000字)
+        # Step 3: 审查 (5个Agent并行，只报告)
+        # Step 4: 润色 (基于审查报告修复 + 去AI痕迹)
+        # Step 5: Data Agent 处理数据链
+        # Step 6: Git 备份
+        return ['Step 1', 'Step 2', 'Step 3', 'Step 4', 'Step 5', 'Step 6']
     elif command == 'webnovel-review':
         return ['Step 1', 'Step 2', 'Step 3', 'Step 4', 'Step 5', 'Step 6', 'Step 7', 'Step 8']
     # 其他命令...

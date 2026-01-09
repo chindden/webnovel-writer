@@ -166,14 +166,18 @@ class StatusReporter:
         # 2) 正文/第1卷/第001章-标题.md
         chapter_files = sorted(self.chapters_dir.rglob("第*.md"))
 
-        # 角色候选（fallback 用）：从 state.json 获取已知角色名
+        # 角色候选（fallback 用）：从 state.json 获取已知角色名 (v5.0 entities_v3 格式)
         known_character_names: List[str] = []
         protagonist_name = ""
         if self.state:
             protagonist_name = self.state.get("protagonist_state", {}).get("name", "") or ""
+            # v5.0: 从 entities_v3.角色 获取角色名
+            entities_v3 = self.state.get("entities_v3", {})
+            characters_dict = entities_v3.get("角色", {})
             known_character_names = [
-                c.get("name", "") for c in self.state.get("entities", {}).get("characters", [])
-                if c.get("name")
+                c.get("canonical_name", char_id)
+                for char_id, c in characters_dict.items()
+                if c.get("canonical_name")
             ]
 
         for chapter_file in chapter_files:
@@ -251,19 +255,20 @@ class StatusReporter:
             })
 
     def analyze_characters(self) -> Dict:
-        """分析角色活跃度"""
+        """分析角色活跃度 (v5.0 entities_v3 格式)"""
         if not self.state:
             return {}
 
         current_chapter = self.state.get("progress", {}).get("current_chapter", 0)
-        entities = self.state.get("entities", {})
-        characters = entities.get("characters", [])
+        # v5.0: 从 entities_v3.角色 获取角色
+        entities_v3 = self.state.get("entities_v3", {})
+        characters_dict = entities_v3.get("角色", {})
 
         # 统计每个角色的最后出场章节
         character_activity = {}
 
-        for char in characters:
-            char_name = char.get("name")
+        for char_id, char in characters_dict.items():
+            char_name = char.get("canonical_name", char_id)
             if not char_name:
                 continue
 
