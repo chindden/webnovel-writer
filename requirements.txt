@@ -3,9 +3,6 @@ pypinyin>=0.44.0
 filelock>=3.0.0
 aiohttp>=3.8.0
 
-# Optional: MCP Server support
-# mcp>=0.1.0
-
 # Development dependencies (install with: pip install -r requirements-dev.txt)
 # pytest>=7.0.0
 # pytest-asyncio>=0.20.0

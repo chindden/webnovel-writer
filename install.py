@@ -13,9 +13,6 @@ webnovel-writer 安装脚本
     # 仅安装依赖
     python install.py --deps-only
 
-    # 安装 MCP 支持
-    python install.py --with-mcp
-
     # 验证安装
     python install.py --verify
 """
@@ -58,12 +55,6 @@ def install_package(dev: bool = False):
         return run_command([sys.executable, "-m", "pip", "install", str(project_root)])
 
 
-def install_mcp():
-    """Install MCP support"""
-    print("\n📦 Installing MCP support...")
-    return run_command([sys.executable, "-m", "pip", "install", "mcp"])
-
-
 def verify_installation():
     """Verify the installation"""
     print("\n🔍 Verifying installation...")
@@ -95,13 +86,6 @@ def verify_installation():
     except ImportError as e:
         checks.append(("❌", f"status_reporter: {e}"))
 
-    # Check MCP
-    try:
-        import mcp
-        checks.append(("✅", "MCP support"))
-    except ImportError:
-        checks.append(("⚠️ ", "MCP support (optional, install with --with-mcp)"))
-
     # Print results
     print("\n📋 Installation check results:")
     all_passed = True
@@ -124,16 +108,18 @@ def print_usage():
 ║                                                              ║
 ║  1. Claude Code 插件模式:                                     ║
 ║     在项目目录中使用 /webnovel-* 命令                           ║
+║     - /webnovel-init    初始化项目                            ║
+║     - /webnovel-query   查询设定                              ║
+║     - /webnovel-plan    规划大纲                              ║
+║     - /webnovel-write   创作章节                              ║
+║     - /webnovel-review  审查章节                              ║
 ║                                                              ║
-║  2. MCP Server 模式:                                         ║
-║     python -m mcp_server                                     ║
-║                                                              ║
-║  3. 命令行工具:                                               ║
+║  2. 命令行工具:                                               ║
 ║     webnovel-init      # 初始化项目                           ║
 ║     webnovel-status    # 生成健康报告                          ║
 ║     webnovel-context   # 构建上下文包                          ║
 ║                                                              ║
-║  4. Python API:                                              ║
+║  3. Python API:                                              ║
 ║     from scripts.data_modules import StateManager             ║
 ║     from scripts.context_pack_builder import ContextPackBuilder║
 ║                                                              ║
@@ -145,7 +131,6 @@ def main():
     parser = argparse.ArgumentParser(description="webnovel-writer 安装脚本")
     parser.add_argument("--dev", action="store_true", help="开发模式安装（可编辑）")
     parser.add_argument("--deps-only", action="store_true", help="仅安装依赖")
-    parser.add_argument("--with-mcp", action="store_true", help="安装 MCP 支持")
     parser.add_argument("--verify", action="store_true", help="验证安装")
 
     args = parser.parse_args()
@@ -162,11 +147,6 @@ def main():
     if not install_deps():
         print("❌ 依赖安装失败")
         sys.exit(1)
-
-    # Install MCP if requested
-    if args.with_mcp:
-        if not install_mcp():
-            print("⚠️  MCP 安装失败，但核心功能仍可用")
 
     # Install package
     if not args.deps_only:

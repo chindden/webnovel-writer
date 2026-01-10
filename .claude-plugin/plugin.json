@@ -21,19 +21,6 @@
   "commands": "./commands/",
   "skills": "./skills/",
   "agents": "./agents/",
-  "mcp": {
-    "server": "./mcp_server.py",
-    "tools": [
-      "webnovel-init",
-      "webnovel-query",
-      "webnovel-status",
-      "webnovel-context"
-    ],
-    "resources": [
-      "webnovel://skills/*",
-      "webnovel://references/*"
-    ]
-  },
   "python": {
     "version": ">=3.8",
     "dependencies": [
