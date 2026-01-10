@@ -1,5 +1,5 @@
 ---
-name: chapter-writing
+name: webnovel-write
 description: Writes webnovel chapters (3000-5000 words) using v5.0 dual-agent architecture. Context Agent gathers context, writer produces pure text (no XML tags), review agents report issues, polish fixes problems, Data Agent extracts entities with AI.
 allowed-tools: Read Write Edit Grep Bash Task
 ---
@@ -68,17 +68,17 @@ allowed-tools: Read Write Edit Grep Bash Task
 
 **加载核心约束**:
 ```bash
-cat "${CLAUDE_PLUGIN_ROOT}/skills/chapter-writing/references/core-constraints.md"
+cat "${CLAUDE_PLUGIN_ROOT}/skills/webnovel-write/references/core-constraints.md"
 ```
 
 **按需加载场景参考**:
 
 | 场景类型 | 判断条件 | 执行命令 |
 |---------|---------|---------|
-| 战斗戏 | 大纲含打斗/对决/追逐 | `cat "${CLAUDE_PLUGIN_ROOT}/skills/chapter-writing/references/writing/combat-scenes.md"` |
-| 情感戏 | 大纲含告白/冲突/羁绊 | `cat "${CLAUDE_PLUGIN_ROOT}/skills/chapter-writing/references/writing/emotion-psychology.md"` |
-| 对话密集 | 预估对话 >50% | `cat "${CLAUDE_PLUGIN_ROOT}/skills/chapter-writing/references/writing/dialogue-writing.md"` |
-| 复杂场景 | 新地点/大场面描写 | `cat "${CLAUDE_PLUGIN_ROOT}/skills/chapter-writing/references/writing/scene-description.md"` |
+| 战斗戏 | 大纲含打斗/对决/追逐 | `cat "${CLAUDE_PLUGIN_ROOT}/skills/webnovel-write/references/writing/combat-scenes.md"` |
+| 情感戏 | 大纲含告白/冲突/羁绊 | `cat "${CLAUDE_PLUGIN_ROOT}/skills/webnovel-write/references/writing/emotion-psychology.md"` |
+| 对话密集 | 预估对话 >50% | `cat "${CLAUDE_PLUGIN_ROOT}/skills/webnovel-write/references/writing/dialogue-writing.md"` |
+| 复杂场景 | 新地点/大场面描写 | `cat "${CLAUDE_PLUGIN_ROOT}/skills/webnovel-write/references/writing/scene-description.md"` |
 
 **输出格式**:
 - Markdown 文件: `正文/第{NNNN}章.md`
@@ -134,7 +134,7 @@ cat "${CLAUDE_PLUGIN_ROOT}/skills/chapter-writing/references/core-constraints.md
 
 **加载润色指南**:
 ```bash
-cat "${CLAUDE_PLUGIN_ROOT}/skills/chapter-writing/references/polish-guide.md"
+cat "${CLAUDE_PLUGIN_ROOT}/skills/webnovel-write/references/polish-guide.md"
 ```
 
 **润色内容**:

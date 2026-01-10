@@ -1,5 +1,5 @@
 ---
-name: project-init
+name: webnovel-init
 description: Initializes webnovel projects with settings, outline framework, and state.json. Supports quick/standard/deep modes. Activates when user wants to start a new novel or /webnovel-init.
 allowed-tools: Bash Write Read Edit AskUserQuestion Task
 ---
@@ -12,8 +12,8 @@ Copy and track progress:
 
 ```
 项目初始化进度：
-- [ ] Step 1: 加载题材套路 (cat "${CLAUDE_PLUGIN_ROOT}/skills/project-init/references/genre-tropes.md")
-- [ ] Step 2: 加载数据规范 (cat "${CLAUDE_PLUGIN_ROOT}/skills/project-init/references/system-data-flow.md")
+- [ ] Step 1: 加载题材套路 (cat "${CLAUDE_PLUGIN_ROOT}/skills/webnovel-init/references/genre-tropes.md")
+- [ ] Step 2: 加载数据规范 (cat "${CLAUDE_PLUGIN_ROOT}/skills/webnovel-init/references/system-data-flow.md")
 - [ ] Step 3: 确认上下文充足
 - [ ] Step 4: 检查现有项目
 - [ ] Step 5: 收集基本信息 (AskUserQuestion)
@@ -29,13 +29,13 @@ Copy and track progress:
 ## Step 1: 加载题材套路（必须执行）
 
 ```bash
-cat "${CLAUDE_PLUGIN_ROOT}/skills/project-init/references/genre-tropes.md"
+cat "${CLAUDE_PLUGIN_ROOT}/skills/webnovel-init/references/genre-tropes.md"
 ```
 
 ## Step 2: 加载数据规范
 
 ```bash
-cat "${CLAUDE_PLUGIN_ROOT}/skills/project-init/references/system-data-flow.md"
+cat "${CLAUDE_PLUGIN_ROOT}/skills/webnovel-init/references/system-data-flow.md"
 ```
 
 ## Step 3: 确认上下文充足
@@ -108,8 +108,8 @@ cat "${CLAUDE_PLUGIN_ROOT}/templates/golden-finger-templates.md"
 
 如为 Deep 模式，额外加载：
 ```bash
-cat "${CLAUDE_PLUGIN_ROOT}/skills/project-init/references/creativity/inspiration-collection.md"
-cat "${CLAUDE_PLUGIN_ROOT}/skills/project-init/references/worldbuilding/power-systems.md"
+cat "${CLAUDE_PLUGIN_ROOT}/skills/webnovel-init/references/creativity/inspiration-collection.md"
+cat "${CLAUDE_PLUGIN_ROOT}/skills/webnovel-init/references/worldbuilding/power-systems.md"
 ```
 
 收集：

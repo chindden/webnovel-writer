@@ -312,7 +312,7 @@ Before outputting, verify:
 
 ## 🔄 Integration Point
 
-**两阶段流水线**（chapter-writing Step 7）：
+**两阶段流水线**（webnovel-write Step 7）：
 ```
 Step 7.1: extract_entities.py → 设定集同步 + state.json 更新
     ↓ (传递提取的实体列表)

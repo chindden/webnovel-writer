@@ -1,5 +1,5 @@
 ---
-name: info-query
+name: webnovel-query
 description: Queries project settings for characters, powers, factions, items, and foreshadowing. Supports urgency analysis and golden finger status. Activates when user asks about story elements or /webnovel-query.
 allowed-tools: Read Grep Bash AskUserQuestion
 ---
@@ -37,22 +37,22 @@ Copy and track progress:
 
 **所有查询必须执行**：
 ```bash
-cat "${CLAUDE_PLUGIN_ROOT}/skills/info-query/references/system-data-flow.md"
+cat "${CLAUDE_PLUGIN_ROOT}/skills/webnovel-query/references/system-data-flow.md"
 ```
 
 **伏笔查询额外执行**：
 ```bash
-cat "${CLAUDE_PLUGIN_ROOT}/skills/info-query/references/advanced/foreshadowing.md"
+cat "${CLAUDE_PLUGIN_ROOT}/skills/webnovel-query/references/advanced/foreshadowing.md"
 ```
 
 **节奏查询额外执行**：
 ```bash
-cat "${CLAUDE_PLUGIN_ROOT}/skills/outline-planning/references/strand-weave-pattern.md"
+cat "${CLAUDE_PLUGIN_ROOT}/skills/webnovel-plan/references/strand-weave-pattern.md"
 ```
 
 **标签格式查询额外执行**：
 ```bash
-cat "${CLAUDE_PLUGIN_ROOT}/skills/info-query/references/tag-specification.md"
+cat "${CLAUDE_PLUGIN_ROOT}/skills/webnovel-query/references/tag-specification.md"
 ```
 
 ## Step 3: 加载项目数据

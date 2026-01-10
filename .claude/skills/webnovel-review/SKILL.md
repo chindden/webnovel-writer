@@ -1,5 +1,5 @@
 ---
-name: quality-review
+name: webnovel-review
 description: Reviews chapter quality using 5 specialized checkers and generates comprehensive reports. Activates when user requests chapter review or /webnovel-review.
 allowed-tools: Read Grep Write Edit Bash Task AskUserQuestion
 ---
@@ -12,10 +12,10 @@ Copy and track progress:
 
 ```
 质量审查进度：
-- [ ] Step 1: 加载核心约束 (cat "${CLAUDE_PLUGIN_ROOT}/skills/quality-review/references/core-constraints.md")
-- [ ] Step 2: 加载爽点标准 (cat "${CLAUDE_PLUGIN_ROOT}/skills/quality-review/references/cool-points-guide.md")
-- [ ] Step 3: 加载节奏标准 (cat "${CLAUDE_PLUGIN_ROOT}/skills/quality-review/references/strand-weave-pattern.md")
-- [ ] Step 4: 加载常见错误 (cat "${CLAUDE_PLUGIN_ROOT}/skills/quality-review/references/common-mistakes.md")
+- [ ] Step 1: 加载核心约束 (cat "${CLAUDE_PLUGIN_ROOT}/skills/webnovel-review/references/core-constraints.md")
+- [ ] Step 2: 加载爽点标准 (cat "${CLAUDE_PLUGIN_ROOT}/skills/webnovel-review/references/cool-points-guide.md")
+- [ ] Step 3: 加载节奏标准 (cat "${CLAUDE_PLUGIN_ROOT}/skills/webnovel-review/references/strand-weave-pattern.md")
+- [ ] Step 4: 加载常见错误 (cat "${CLAUDE_PLUGIN_ROOT}/skills/webnovel-review/references/common-mistakes.md")
 - [ ] Step 5: 加载项目状态 (cat .webnovel/state.json)
 - [ ] Step 6: 确认上下文充足
 - [ ] Step 7: 调用 5 个检查员 (并行 Task)
@@ -28,25 +28,25 @@ Copy and track progress:
 ## Step 1: 加载核心约束（必须执行）
 
 ```bash
-cat "${CLAUDE_PLUGIN_ROOT}/skills/quality-review/references/core-constraints.md"
+cat "${CLAUDE_PLUGIN_ROOT}/skills/webnovel-review/references/core-constraints.md"
 ```
 
 ## Step 2: 加载爽点标准（必须执行）
 
 ```bash
-cat "${CLAUDE_PLUGIN_ROOT}/skills/quality-review/references/cool-points-guide.md"
+cat "${CLAUDE_PLUGIN_ROOT}/skills/webnovel-review/references/cool-points-guide.md"
 ```
 
 ## Step 3: 加载节奏标准（必须执行）
 
 ```bash
-cat "${CLAUDE_PLUGIN_ROOT}/skills/quality-review/references/strand-weave-pattern.md"
+cat "${CLAUDE_PLUGIN_ROOT}/skills/webnovel-review/references/strand-weave-pattern.md"
 ```
 
 ## Step 4: 加载常见错误
 
 ```bash
-cat "${CLAUDE_PLUGIN_ROOT}/skills/quality-review/references/common-mistakes.md"
+cat "${CLAUDE_PLUGIN_ROOT}/skills/webnovel-review/references/common-mistakes.md"
 ```
 
 ## Step 5: 加载项目状态

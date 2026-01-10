@@ -1,5 +1,5 @@
 ---
-name: outline-planning
+name: webnovel-plan
 description: Plans detailed volume outlines with chapter-by-chapter breakdown, cool-point distribution, and Strand Weave pacing. Activates when user requests outline planning or /webnovel-plan.
 allowed-tools: Read Write Edit AskUserQuestion Bash
 ---
@@ -12,9 +12,9 @@ Copy and track progress:
 
 ```
 大纲规划进度：
-- [ ] Step 1: 加载爽点指南 (cat "${CLAUDE_PLUGIN_ROOT}/skills/outline-planning/references/cool-points-guide.md")
-- [ ] Step 2: 加载节奏规范 (cat "${CLAUDE_PLUGIN_ROOT}/skills/outline-planning/references/strand-weave-pattern.md")
-- [ ] Step 3: 加载题材套路 (cat "${CLAUDE_PLUGIN_ROOT}/skills/project-init/references/genre-tropes.md")
+- [ ] Step 1: 加载爽点指南 (cat "${CLAUDE_PLUGIN_ROOT}/skills/webnovel-plan/references/cool-points-guide.md")
+- [ ] Step 2: 加载节奏规范 (cat "${CLAUDE_PLUGIN_ROOT}/skills/webnovel-plan/references/strand-weave-pattern.md")
+- [ ] Step 3: 加载题材套路 (cat "${CLAUDE_PLUGIN_ROOT}/skills/webnovel-init/references/genre-tropes.md")
 - [ ] Step 4: 加载项目数据 (state.json + 总纲)
 - [ ] Step 5: 确认上下文充足
 - [ ] Step 6: 交互式收集需求 (AskUserQuestion)
@@ -28,7 +28,7 @@ Copy and track progress:
 ## Step 1: 加载爽点指南（必须执行）
 
 ```bash
-cat "${CLAUDE_PLUGIN_ROOT}/skills/outline-planning/references/cool-points-guide.md"
+cat "${CLAUDE_PLUGIN_ROOT}/skills/webnovel-plan/references/cool-points-guide.md"
 ```
 
 关键规则：
@@ -39,7 +39,7 @@ cat "${CLAUDE_PLUGIN_ROOT}/skills/outline-planning/references/cool-points-guide.
 ## Step 2: 加载节奏规范（必须执行）
 
 ```bash
-cat "${CLAUDE_PLUGIN_ROOT}/skills/outline-planning/references/strand-weave-pattern.md"
+cat "${CLAUDE_PLUGIN_ROOT}/skills/webnovel-plan/references/strand-weave-pattern.md"
 ```
 
 关键规则：
@@ -51,7 +51,7 @@ cat "${CLAUDE_PLUGIN_ROOT}/skills/outline-planning/references/strand-weave-patte
 ## Step 3: 加载题材套路
 
 ```bash
-cat "${CLAUDE_PLUGIN_ROOT}/skills/project-init/references/genre-tropes.md"
+cat "${CLAUDE_PLUGIN_ROOT}/skills/webnovel-init/references/genre-tropes.md"
 ```
 
 ## Step 4: 加载项目数据

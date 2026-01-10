@@ -1,5 +1,5 @@
 ---
-name: task-resume
+name: webnovel-resume
 description: Recovers interrupted webnovel tasks with precise workflow state tracking. Detects interruption point and provides safe recovery options. Activates when user wants to resume or /webnovel-resume.
 allowed-tools: Read Bash AskUserQuestion
 ---
@@ -12,8 +12,8 @@ Copy and track progress:
 
 ```
 任务恢复进度：
-- [ ] Step 1: 加载恢复协议 (cat "${CLAUDE_PLUGIN_ROOT}/skills/task-resume/references/workflow-resume.md")
-- [ ] Step 2: 加载数据规范 (cat "${CLAUDE_PLUGIN_ROOT}/skills/task-resume/references/system-data-flow.md")
+- [ ] Step 1: 加载恢复协议 (cat "${CLAUDE_PLUGIN_ROOT}/skills/webnovel-resume/references/workflow-resume.md")
+- [ ] Step 2: 加载数据规范 (cat "${CLAUDE_PLUGIN_ROOT}/skills/webnovel-resume/references/system-data-flow.md")
 - [ ] Step 3: 确认上下文充足
 - [ ] Step 4: 检测中断状态
 - [ ] Step 5: 展示恢复选项 (AskUserQuestion)
@@ -26,7 +26,7 @@ Copy and track progress:
 ## Step 1: 加载恢复协议（必须执行）
 
 ```bash
-cat "${CLAUDE_PLUGIN_ROOT}/skills/task-resume/references/workflow-resume.md"
+cat "${CLAUDE_PLUGIN_ROOT}/skills/webnovel-resume/references/workflow-resume.md"
 ```
 
 **核心原则**（读取后应用）：
@@ -37,7 +37,7 @@ cat "${CLAUDE_PLUGIN_ROOT}/skills/task-resume/references/workflow-resume.md"
 ## Step 2: 加载数据规范
 
 ```bash
-cat "${CLAUDE_PLUGIN_ROOT}/skills/task-resume/references/system-data-flow.md"
+cat "${CLAUDE_PLUGIN_ROOT}/skills/webnovel-resume/references/system-data-flow.md"
 ```
 
 ## Step 3: 确认上下文充足
