@@ -1,0 +1,26 @@
+name: Sync Fork with Upstream
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * *' # 每天 UTC 时间 0:00 执行
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fork Sync (Upstream Sync)
+        uses: aormsby/Fork-Sync-With-Upstream-action@v3.4
+        with:
+          # ✅ 直接使用 owner/repo 格式，非常直观
+          upstream_sync_repo: lingfengQAQ/webnovel-writer
+          # 你的仓库中要接收更新的目标分支
+          target_sync_branch: master
+          # 上游仓库中要同步的源分支（通常是其主分支）
+          upstream_sync_branch: master
+          # GitHub Token（通常不需要修改，使用默认的 GITHUB_TOKEN 即可）
+          target_repo_token: ${{ secrets.GITHUB_TOKEN }}
