@@ -21,7 +21,7 @@
 ```bash
 # 1. 安装到项目
 cd your-novel-project
-git clone https://github.com/xxx/webnovel-writer.git .claude
+git clone https://github.com/chindden/webnovel-writer.git .claude
 
 # 2. 初始化项目
 /webnovel-init
